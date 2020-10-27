@@ -1,0 +1,53 @@
+\documentclass{report}
+\usepackage{listings}
+\usepackage{mips}
+\usepackage{color}
+
+
+\definecolor{CommentGreen}{rgb}{0,.6,0}
+\lstset{
+	language=[mips]Assembler,
+	backgroundcolor=\color[RGB]{245,245,244},
+	escapechar=@, % include LaTeX code between `@' characters
+	keepspaces=true,   % needed to preserve spacing with lstinline
+	basicstyle=\footnotesize\ttfamily\bfseries,
+	commentstyle=\color{CommentGreen},
+	stringstyle=\color{cyan},
+	showstringspaces=false,
+	keywordstyle=[1]\color{blue},    % instructions
+	keywordstyle=[2]\color{magenta}, % directives
+	keywordstyle=[3]\color{red},     % registers
+}
+
+
+\author{Vincent WENDLING}
+\title{Projet Labyrithe}
+
+\begin{document}
+
+\chapter{Introducion}
+Pour commencer, moi et mon binôme Germain nous sommes mis d'accord sur le partage des tâches. Il s'occuperait de la génération du labyrinthe, quand à moi, je me chargerais de la résolution. 
+
+
+\chapter{Prendre en entrée la labyrithe}
+La première question à se poser est la suivante: \textbf{Comment charger le fichier texte du labyrinthe dans le programme ?}
+\newline
+\newline
+Ce processus ce passse en deux partie : 
+
+\begin{enumerate}
+	\item Le chargement du fichier texte
+	\item La lecture du fichier texte
+\end{enumerate}
+
+
+Ces deux partie feront intervenir des syscall.
+
+\paragraph{Chargement du fichier} 
+Premièrement, nous voulons charger le fichier, cela pourra se faire à l'aide du code suivant :
+\begin{lstlisting}[language={[mips]Assembler}]
+	syscall $v0 13
+	li $a1 3
+\end{lstlisting}
+
+\end{document}

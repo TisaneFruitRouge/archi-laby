@@ -1,3 +1,14 @@
+####################- INFOS GENERALES -##############
+# - On ne demande pas la taille en entrée si on est dans le mode de résolution
+# - nomFichier == NOM DU FICHIER
+# - $s0 == MODE
+# - $s1 == TAILLE DU FICHER
+#####################################################
+
+###########- MODIFS POUR PLUS TARD -#################
+# - Faire en sorte que si mode==2, pas besoin de 3 arguments (mais que de deux)
+#####################################################
+
 .data
 	retourChariot : .asciiz "\n"  # chaine de caractère pour le retour chariot
 	chaineVide : .asciiz "" # juste une chaine vide
@@ -27,11 +38,17 @@ _main:
 
 startSansParam:
 	jal choixFichier1	# Appel de la fonction choixFichier1
-	jal choixTaille1	# Appel de la fonction choixTaille1
-	la $s1 ($v0)	# Place dans $s1 la taille du labyrinthe
+
 	jal choixMode1	# Appel de la fonction choixMode1
 	la $s0 ($v0)	# Place dans $s0 le mode d'exécution
-	j suiteMain		# Continue l'exécution principale
+	addi $s0 $s0 -1	# On addition -1 à $s0 (comme ça on peut beqz) (donc $s0==0 ou $s0==1)
+
+	bnez $s0 finParam     # On ne demande pas la taille si on est dans le mode résolution
+		jal choixTaille1  # Appel de la fonction choixTaille1
+		la $s1 ($v0)	  # Place dans $s1 la taille du labyrinthe
+
+	finParam:
+		j suiteMain		# Continue l'exécution principale
 
 startAvecParam:
 	bne $a0 3  erreurParam	
@@ -48,7 +65,7 @@ startAvecParam:
 	jal printfString
 	j exit
 
-suiteMain:
+#Fonction pour quitter le programme
 exit:
 	li $v0 10
 	syscall
@@ -229,15 +246,15 @@ choixMode1:
 	jal printfString			# Affichage du menu
 	la $a0 texteMode			# Chargement du message de choix
 	li $v0 4				
-	syscall				# Affichage du message de choix
+	syscall				    # Affichage du message de choix
 	li $v0 5				# Lecture de l'entier representant le choix
 	syscall
 	beq $v0 1 fin_choixMode1	# Vérifie si la valeur est égale à 1 ou 2 
 	beq $v0 2 fin_choixMode1
 	la $a0 texteModeError		# Cas d'une valeur invalide
-	#li $a1 2				# On met une boite de dialogue pour les erreurs ?
-	#li $v0 55
-	#syscall
+	li $a1 2				    # On met une boite de dialogue pour les erreurs ?
+	li $v0 55
+	syscall
 	jal printfString			# Affichage du message d'erreur
 	j deb_choixMode1			# Redemande à l'utilisateur de faire un choix
 	
@@ -329,3 +346,44 @@ choixMode2:
 	jr $ra
 	
 # BLOC DES FONCTIONS PRINCIPALES
+
+
+suiteMain: 
+	
+	beqz $s0 modeGeneration
+	j modeResolution
+
+
+modeGeneration:
+	
+	### Code Germain
+	
+	j exit
+
+modeResolution:
+	
+	# Ouvre le fichier pour lecture
+
+	li   $v0, 13       		  # system call for open file
+	la   $a0, NomFichier      # input file name
+	li   $a1, 0               # flag for reading
+	li   $a2, 0               # mode is ignored
+	syscall                   # open a file 
+	move $s0, $v0             # save the file descriptor 
+
+	# Lis le fichier qui vient d'être ouvert
+
+	li   $v0, 14              # system call for reading from file
+	move $a0, $s0             # file descriptor 
+	la   $a1, buffer          # address of buffer from which to read
+	li   $a2,  11             # hardcoded buffer length
+	syscall                   # read from file
+
+	#li  $v0, 4         # 
+	la  $a0, buffer     # buffer contains the values
+	syscall             # print int
+
+	lb $t1 , buffer
+
+	j exit
+	
