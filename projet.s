@@ -1,10 +1,12 @@
 .data
+	laby : .space 400000
+	nomFichier: .space 256
 	retourChariot : .asciiz "\n"  # chaine de caractère pour le retour chariot
 	chaineVide : .asciiz "" # juste une chaine vide
+	espace : .asciiz " "   # juste un espace
 	
 	texteErreurParam : .asciiz "Nombre d'arguments incorrect"
 	
-	nomFichier: .space 256
 	extension1 : .asciiz ".txt"
 	extension2 : .asciiz ".txt.resolu"
 	
@@ -26,29 +28,35 @@ _main:
 	bnez $a0 startAvecParam # Cas où des arguments sont rentrés en ligne de commande
 
 startSansParam:
-	jal choixFichier1	# Appel de la fonction choixFichier1
-	jal choixTaille1	# Appel de la fonction choixTaille1
-	la $s1 ($v0)	# Place dans $s1 la taille du labyrinthe
-	jal choixMode1	# Appel de la fonction choixMode1
-	la $s0 ($v0)	# Place dans $s0 le mode d'exécution
-	j suiteMain		# Continue l'exécution principale
+	jal choixFichier1		# Appel de la fonction choixFichier1
+	jal choixMode1		# Appel de la fonction choixMode1
+	la $s0 ($v0)		# Place dans $s0 le mode d'exécution
+	addi $s0 $s0 -1
+	bnez $s0 suiteMain	# Passe directement à la suite si c'est le mode 2
+	jal choixTaille1		# Appel de la fonction choixTaille1
+	la $s1 ($v0)		# Place dans $s1 la taille du labyrinthe
+	j suiteMain			# Continue l'exécution principale
 
 startAvecParam:
-	bne $a0 3  erreurParam	
-	jal choixFichier2	# Appel de la fonction choixFichier2
-	jal choixTaille2	# Appel de la fonction choixTaille2
-	la $s1 ($v0)	# Place dans $s1 la taille du labyrinthe
-	jal choixMode2	# Appel de la fonction choixMode2
-	la $s0 ($v0) 	# Place dans $s0 le mode d'exécution
-	la $a0 ($s0)
-	jal printfInt
-	j suiteMain		# Continue l'exécution principale
+	bne $a0 3  erreurParam
+		
+	jal choixFichier2		# Appel de la fonction choixFichier2
+	jal choixMode2		# Appel de la fonction choixMode2
+	la $s0 ($v0) 		# Place dans $s0 le mode d'exécution
+	addi $s0 $s0 -1
+	bnez $s0 suiteMain	# Passe directement à la suite si c'est le mode 2
+	jal choixTaille2		# Appel de la fonction choixTaille2
+	la $s1 ($v0)		# Place dans $s1 la taille du labyrinthe
+	j suiteMain			# Continue l'exécution principale
+	
 	erreurParam:
 	la $a0 texteErreurParam
 	jal printfString
 	j exit
 
 suiteMain:
+	beqz $s0 modeGeneration
+	j modeResolution
 exit:
 	li $v0 10
 	syscall
@@ -329,3 +337,100 @@ choixMode2:
 	jr $ra
 	
 # BLOC DES FONCTIONS PRINCIPALES
+
+# Cette fonction initialise un tableau d'entier NxN avec une valeur
+# $a0 : contient la taille du tableau
+# $a1 : contient l'adresse du premier element du tableau
+# $a2 : contient la valeur utilisée pour initialiser
+initialiseLabyrinthe:
+	# Prologue
+	addi $sp $sp -16
+	sw $a0 12($sp)
+	sw $a1 8($sp)
+	sw $a2 4($sp)
+	sw $ra 0($sp)
+	
+	# Corps de la fonction
+	li $t0 0 					# itérateur de la ligne 
+	deb_parcoursLigneI:
+	beq $t0 $a0 fin_initialiseLabyrinthe # for (i = 0, i < $a0, i++)
+	li $t1 0 					# itérateur de la colonne 
+	deb_parcoursColonneI:
+	beq $t1 $a0 fin_parcoursColonneI 	# for (j = 0, j < $a0, j++)
+	mul $t3 $t0 $a0				# ((i*TailleColonne
+	add $t3 $t3 $t1				#			  + j)
+	mul $t3 $t3 4				#			      *sizeOf(Int))
+	add $t3 $t3 $a1				#                                             + addrDebut == tab[i][j]
+	sw $a2 ($t3)				# tab[i][j] = $a2
+	addi $t1 $t1 1				# Incrémente j
+	j deb_parcoursColonneI			# Passe au début de la boucle j
+	fin_parcoursColonneI:
+	addi $t0 $t0 1				# Incrément i
+	j deb_parcoursLigneI			# Passe au début de la boucle i
+	
+	# Epilogue
+	fin_initialiseLabyrinthe:
+	lw $a0 12($sp)
+	lw $a1 8($sp)
+	lw $a2 4($sp)
+	lw $ra 0($sp)
+	addi $sp $sp 16
+	jr $ra
+
+# Cette fonction affiche le labyrinthe
+# $a0 : contient la taille du tableau
+# $a1 : contient l'adresse du premier element du tableau
+afficheLabyrinthe:
+	# Prologue
+	addi $sp $sp -12
+	sw $a0 8($sp)
+	sw $a1 4($sp)
+	sw $ra 0($sp)
+	
+	# Corps de la fonction
+	la $t0 ($a0)
+	li $t1 0 					# itérateur de la ligne 
+	deb_parcoursLigneA:
+	beq $t1 $t0 fin_afficheLabyrinthe 	# for (i = 0, i < $a0, i++)
+	li $t2 0 					# itérateur de la colonne 
+	deb_parcoursColonneA:
+	beq $t2 $t0 fin_parcoursColonneA	# for (j = 0, j < $a0, j++)
+	mul $t4 $t1 $t0				# ((i*TailleColonne
+	add $t4 $t4 $t2				#			  + j)
+	mul $t4 $t4 4				#			      *sizeOf(Int))
+	add $t4 $t4 $a1				#                                             + addrDebut == tab[i][j]
+	lw $a0 ($t4)				# $a0 = tab[i][j]
+	li $v0 1					
+	syscall					# Affiche l'entier tab[i][j]
+	la $a0 espace				# Charge un espace
+	li $v0 4
+	syscall					# Affiche un espace
+	addi $t2 $t2 1				# Incrémente j
+	j deb_parcoursColonneA		# Passe au début de la boucle j
+	fin_parcoursColonneA:
+	la $a0 retourChariot			# Charge '\n'
+	li $v0 4
+	syscall					# Fait un retour chariot
+	addi $t1 $t1 1				# Incremente i
+	j deb_parcoursLigneA			# Passe au début de la boucle i
+	
+	# Epilogue
+	fin_afficheLabyrinthe:
+	lw $a0 8($sp)
+	lw $a1 4($sp)
+	lw $ra 0($sp)
+	addi $sp $sp 12
+	jr $ra
+	
+# BLOC GENERATION
+modeGeneration:
+	la $a0 ($s1) 		# Place dans $a0 la taille du labyrinthe
+ 	la $a1 laby			# Place dans $a1 l'adresse du début du labyrinthe
+ 	li $a2 15			# initialise le labyrinthe avec la valeur 15  :  00001111
+ 	jal initialiseLabyrinthe   # initialisation du labyrinthe
+ 	jal afficheLabyrinthe
+	j exit
+	
+# BLOC RESOLUTION
+modeResolution:
+	j exit
