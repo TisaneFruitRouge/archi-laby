@@ -421,6 +421,65 @@ afficheLabyrinthe:
 	lw $ra 0($sp)
 	addi $sp $sp 12
 	jr $ra
+
+# Cette fonction change le Nieme bit de $a1
+# $a0 : position du bit à changer
+# $a1 : valeur à changer
+# Retourne dans $v0 la valeur modifiée
+changeBitN:
+	# Prologue 
+	addi $sp $sp -12
+	sw $a0 8($sp)
+	sw $a1 4($sp)
+	sw $ra 0($sp)
+	
+	# Corps de la fonction
+	bge $a0 4 bitSup4			# Cas des bits de 0 à 3
+		beq $a0 3 bit3			# Recherche du bit à changer
+			beq $a0 2 bit2	
+				beq $a0 1 bit1
+					li $t0 254	# Masque pour le bit 0 : 254 = 11111110
+					j finCas1	# Aller à la fin du premier cas
+				bit1 : 
+				li $t0 253		# Masque pour le bit 1 : 253 = 11111101
+				j finCas1		# Aller à la fin du premier cas
+			bit2 :
+			li $t0 251			# Masque pour le bit 2 : 251 = 11111011
+			j finCas1			# Aller à la fin du premier cas
+		bit3:
+		li $t0 247				# Masque pour le bit 3 : 247 = 11110111
+		j finCas1				# Aller à la fin du premier cas
+	bitSup4:					# Cas des bits de 4 à 7
+	li $t1 1
+	beq $a0 4 bit4				# Recherche du bit à changer
+		beq $a0 5 bit5
+			beq $a0 6 bit6
+				sll $t0 $t1 7	# Masque pour le bit 7 : 1 << 7 : 10000000
+				j finCas2		# Aller à la fin du second cas
+			bit6:
+			sll $t0 $t1 6		# Masque pour le bit 7 : 1 << 6 : 01000000
+			j finCas2			# Aller à la fin du second cas
+		bit5:
+		sll $t0 $t1 5			# Masque pour le bit 7 : 1 << 5 : 00100000
+		j finCas2				# Aller à la fin du second cas
+	bit4:
+	sll $t0 $t1 4				# Masque pour le bit 7 : 1 << 4 : 00010000
+	j finCas2					# Aller à la fin du second cas
+	
+	finCas1: 					# Fin du premier cas 
+		and $v0 $t0 $a1			# AND bit à bit à $a1
+		j fin_changeBitN			# Aller à la fin de la fonction
+	finCas2:					# Fin du second cas
+		addu $v0 $t0 $a1			# Mettre 1 au Nieme bit
+		j fin_changeBitN			# Aller à la fin de la fonction
+	
+	# Epilogue
+	fin_changeBitN:
+	lw $a0 8($sp)
+	lw $a1 4($sp)
+	lw $ra 0($sp)
+	addi $sp $sp 12
+	jr $ra
 	
 # BLOC GENERATION
 modeGeneration:
