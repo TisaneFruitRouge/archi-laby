@@ -1,7 +1,7 @@
 .data
 	laby : .space 400000
 	nomFichier: .space 256
-	retourChariot : .asciiz "\n"  # chaine de caractère pour le retour chariot
+	retourChariot : .asciiz "\n"  # chaine de caractï¿½re pour le retour chariot
 	chaineVide : .asciiz "" # juste une chaine vide
 	espace : .asciiz " "   # juste un espace
 	
@@ -22,32 +22,32 @@
 .text
 .globl _main
 
-# Point d'entrée du programme
+# Point d'entrï¿½e du programme
 _main:         
-	beqz $a0 startSansParam # Cas où des arguments ne sont pas rentrés en ligne de commande
-	bnez $a0 startAvecParam # Cas où des arguments sont rentrés en ligne de commande
+	beqz $a0 startSansParam # Cas oï¿½ des arguments ne sont pas rentrï¿½s en ligne de commande
+	bnez $a0 startAvecParam # Cas oï¿½ des arguments sont rentrï¿½s en ligne de commande
 
 startSansParam:
 	jal choixFichier1		# Appel de la fonction choixFichier1
 	jal choixMode1		# Appel de la fonction choixMode1
-	la $s0 ($v0)		# Place dans $s0 le mode d'exécution
+	la $s0 ($v0)		# Place dans $s0 le mode d'exï¿½cution
 	addi $s0 $s0 -1
-	bnez $s0 suiteMain	# Passe directement à la suite si c'est le mode 2
+	bnez $s0 suiteMain	# Passe directement ï¿½ la suite si c'est le mode 2
 	jal choixTaille1		# Appel de la fonction choixTaille1
 	la $s1 ($v0)		# Place dans $s1 la taille du labyrinthe
-	j suiteMain			# Continue l'exécution principale
+	j suiteMain			# Continue l'exï¿½cution principale
 
 startAvecParam:
 	bne $a0 3  erreurParam
 		
 	jal choixFichier2		# Appel de la fonction choixFichier2
 	jal choixMode2		# Appel de la fonction choixMode2
-	la $s0 ($v0) 		# Place dans $s0 le mode d'exécution
+	la $s0 ($v0) 		# Place dans $s0 le mode d'exï¿½cution
 	addi $s0 $s0 -1
-	bnez $s0 suiteMain	# Passe directement à la suite si c'est le mode 2
+	bnez $s0 suiteMain	# Passe directement ï¿½ la suite si c'est le mode 2
 	jal choixTaille2		# Appel de la fonction choixTaille2
 	la $s1 ($v0)		# Place dans $s1 la taille du labyrinthe
-	j suiteMain			# Continue l'exécution principale
+	j suiteMain			# Continue l'exï¿½cution principale
 	
 	erreurParam:
 	la $a0 texteErreurParam
@@ -63,7 +63,7 @@ exit:
 	
 # BLOC DES FONCTIONS UTILITAIRES
 
-# Affiche la chaine de caractères dans $a0 puis fait un retour chariot
+# Affiche la chaine de caractï¿½res dans $a0 puis fait un retour chariot
 printfString :
 	# Prologue
 	addi $sp $sp -8
@@ -103,7 +103,7 @@ printfInt :
 	addi $sp $sp 8
 	jr $ra
 
-# Cette fonction caste la chaine de caractère contenu dans $a0 en entier
+# Cette fonction caste la chaine de caractï¿½re contenu dans $a0 en entier
 # Retourne dans $v0 l'entier
 CastStringInt:
 	# Prologue
@@ -112,14 +112,14 @@ CastStringInt:
 	sw $ra 0($sp)
 	
 	# Corps de la fonction
-	la $t0 ($a0) 			# La chaine de caractères à caster
-	li $t1 0				# Itérateur
+	la $t0 ($a0) 			# La chaine de caractï¿½res ï¿½ caster
+	li $t1 0				# Itï¿½rateur
 	li $t7 0				# Valeur finale
 	deb_CastStringInt:
-	add $t2 $t0 $t1			# Place dans $t2 l'adresse du caractère 
-	lbu $t3 ($t2)			# Charge dans $t3 le byte du caractère
-	beq $t3 '\0' fin_CastStringInt # Vérifie si ce n'est pas la sentinelle
-	addi $t4 $t3 -48			# Convertit le caractère en Int
+	add $t2 $t0 $t1			# Place dans $t2 l'adresse du caractï¿½re 
+	lbu $t3 ($t2)			# Charge dans $t3 le byte du caractï¿½re
+	beq $t3 '\0' fin_CastStringInt # Vï¿½rifie si ce n'est pas la sentinelle
+	addi $t4 $t3 -48			# Convertit le caractï¿½re en Int
 	mul $t7 $t7 10 
 	add $t7 $t7 $t4
 	addi $t1 $t1 1
@@ -133,8 +133,8 @@ CastStringInt:
 	la $v0 ($t7)
 	jr $ra
 
-# Cette fonction concatène deux chaines de caractères dans les adresses de debuts sont dans $a0 et $a1
-# Ajoute à la fin la chaine pointée par $a0 la chaine pointée par $a1
+# Cette fonction concatï¿½ne deux chaines de caractï¿½res dans les adresses de debuts sont dans $a0 et $a1
+# Ajoute ï¿½ la fin la chaine pointï¿½e par $a0 la chaine pointï¿½e par $a1
 concat:
 	# Prologue
 	addi $sp $sp -12
@@ -144,18 +144,18 @@ concat:
 	
 	# Corps de la fonction
 	deb_premiereChaine:			# Parcours de la premiere chaine
-	lb $t0 ($a0)					# Prends le caractère à l'adresse $a0
-	beq $t0 '\n' deb_secondeChaine	# Si c'est le retourChariot alors aller à la seconde chaine
-	addi $a0 $a0 1 				# Sinon prendre le caractère suivant
-	j deb_premiereChaine			# Répéter l'itération
+	lb $t0 ($a0)					# Prends le caractï¿½re ï¿½ l'adresse $a0
+	beq $t0 '\n' deb_secondeChaine	# Si c'est le retourChariot alors aller ï¿½ la seconde chaine
+	addi $a0 $a0 1 				# Sinon prendre le caractï¿½re suivant
+	j deb_premiereChaine			# Rï¿½pï¿½ter l'itï¿½ration
 	
 	deb_secondeChaine:			#Parcours de la seconde chaine
-	lb $t1 ($a1)					# Prends le caractère à l'adresse $a1
+	lb $t1 ($a1)					# Prends le caractï¿½re ï¿½ l'adresse $a1
 	beq $t1 '\0' fin_concat			# Si c'est la sentinelle alors sortir de la fonction
-	sb $t1 ($a0)				# Sinon ajouter à la fin de la premiere chaine
-	addi $a0 $a0 1				# Passer à la prochaine adresse dans la premiere chaine
-	addi $a1 $a1 1				# Passer au caractère suivant dans la seconde chaine
-	j deb_secondeChaine 			# Répéter l'itération
+	sb $t1 ($a0)				# Sinon ajouter ï¿½ la fin de la premiere chaine
+	addi $a0 $a0 1				# Passer ï¿½ la prochaine adresse dans la premiere chaine
+	addi $a1 $a1 1				# Passer au caractï¿½re suivant dans la seconde chaine
+	j deb_secondeChaine 			# Rï¿½pï¿½ter l'itï¿½ration
 	
 	# Epilogue
 	fin_concat:
@@ -182,7 +182,7 @@ choixFichier1:
 	la $a0 nomFichier				# Chargement de l'adresse de stockage
 	li $a1 256					# Chargement de la taille max
 	li $v0 8					
-	syscall					# Appel systeme pour demander à l'utilsateur
+	syscall					# Appel systeme pour demander ï¿½ l'utilsateur
 	la $a0 nomFichier				# Chargement du premier argument de concat
 	la $a1 extension1				# Chargement du second argument de concat
 	jal concat					# Concatenation de $a0 et $a1
@@ -208,11 +208,11 @@ choixTaille1:
 	li $v0 4
 	syscall					# Affichage du message de la demande
 	li $v0 5					
-	syscall					# Lecture de l'entier représentant la taille
-	bgt $v0 1 fin_choixTaille1		# Teste si la taille est supérieure stricte à 1
+	syscall					# Lecture de l'entier reprï¿½sentant la taille
+	bgt $v0 1 fin_choixTaille1		# Teste si la taille est supï¿½rieure stricte ï¿½ 1
 	la $a0 texteDemandeTailleError	# Cas d'une erreur
 	jal printfString				# Affichage du message d'erreur
-	j deb_choixTaille1			# Redemande à l'utilisateur d'entrer une valeur
+	j deb_choixTaille1			# Redemande ï¿½ l'utilisateur d'entrer une valeur
 	
 	# Epilogue
 	fin_choixTaille1:
@@ -222,7 +222,7 @@ choixTaille1:
 	jr $ra
 	
 
-# Cette fonction permet de choisir le mode d'exécution dans le cas du lancement du programme sans arguments
+# Cette fonction permet de choisir le mode d'exï¿½cution dans le cas du lancement du programme sans arguments
 # Retourne dans $v0 le choix de l'utilisateur
 choixMode1:
 	# Prologue
@@ -240,14 +240,14 @@ choixMode1:
 	syscall				# Affichage du message de choix
 	li $v0 5				# Lecture de l'entier representant le choix
 	syscall
-	beq $v0 1 fin_choixMode1	# Vérifie si la valeur est égale à 1 ou 2 
+	beq $v0 1 fin_choixMode1	# Vï¿½rifie si la valeur est ï¿½gale ï¿½ 1 ou 2 
 	beq $v0 2 fin_choixMode1
 	la $a0 texteModeError		# Cas d'une valeur invalide
 	#li $a1 2				# On met une boite de dialogue pour les erreurs ?
 	#li $v0 55
 	#syscall
 	jal printfString			# Affichage du message d'erreur
-	j deb_choixMode1			# Redemande à l'utilisateur de faire un choix
+	j deb_choixMode1			# Redemande ï¿½ l'utilisateur de faire un choix
 	
 	# Epilogue
 	fin_choixMode1:
@@ -258,7 +258,7 @@ choixMode1:
 	jr $ra
 
 	
-# Cette fonction récupère le nom du fichier passée en ligne de commande
+# Cette fonction rï¿½cupï¿½re le nom du fichier passï¿½e en ligne de commande
 # Place dans nomFichier le nom du fichier	
 choixFichier2:
 	# Prologue
@@ -269,14 +269,14 @@ choixFichier2:
 	
 	# Corps de la fonction
 	la $t0 nomFichier			# Charge dans $t0 l'adresse du nom du fichier
-	lw $t1 8($a1)			# Charge dans $t1 le troisieme argument entré en ligne de commande
+	lw $t1 8($a1)			# Charge dans $t1 le troisieme argument entrï¿½ en ligne de commande
 	deb_choixFichier2:
-	lb $t2 ($t1)				# Prend le premier caractère à l'adresse $t1
-	beq $t2 '\0' fin_choixFichier2	# Si c'est la sentinelle alors aller à la fin de la fonction
-	sb $t2 ($t0)				# Sinon mettre dans à la fin de NomFichier
-	addi $t0 $t0 1			# Passer à l'adresse suivante pour nomFichier
-	addi $t1 $t1 1			# Prendre le caractère suivant
-	j deb_choixFichier2		# Répéter l'itération
+	lb $t2 ($t1)				# Prend le premier caractï¿½re ï¿½ l'adresse $t1
+	beq $t2 '\0' fin_choixFichier2	# Si c'est la sentinelle alors aller ï¿½ la fin de la fonction
+	sb $t2 ($t0)				# Sinon mettre dans ï¿½ la fin de NomFichier
+	addi $t0 $t0 1			# Passer ï¿½ l'adresse suivante pour nomFichier
+	addi $t1 $t1 1			# Prendre le caractï¿½re suivant
+	j deb_choixFichier2		# Rï¿½pï¿½ter l'itï¿½ration
 												
 	# Epilogue
 	fin_choixFichier2:
@@ -286,7 +286,7 @@ choixFichier2:
 	addi $sp $sp 12
 	jr $ra
 
-# Cette fonction récupère la taille du labyrinthe passée en ligne de commande
+# Cette fonction rï¿½cupï¿½re la taille du labyrinthe passï¿½e en ligne de commande
 # Retourne dans $v0 la taille 
 choixTaille2:
 	# Prologue
@@ -296,9 +296,9 @@ choixTaille2:
 	sw $ra 0($sp)
 	
 	# Corps de la fonction
-	lw $a0 4($a1)				# Charge dans $a0 le deuxieme argument entré en ligne de commande
-	jal CastStringInt				# Caste en entier la chaine de caractère
-	bgt $v0 1 fin_choixTaille1		# Teste si la taille est supérieure stricte à 1
+	lw $a0 4($a1)				# Charge dans $a0 le deuxieme argument entrï¿½ en ligne de commande
+	jal CastStringInt				# Caste en entier la chaine de caractï¿½re
+	bgt $v0 1 fin_choixTaille1		# Teste si la taille est supï¿½rieure stricte ï¿½ 1
 	la $a0 texteDemandeTailleError	# Cas d'une erreur
 	jal printfString				# Affichage du message d'erreur
 	j exit						# Sortie du programme
@@ -310,7 +310,7 @@ choixTaille2:
 	addi $sp $sp 12
 	jr $ra
 	
-# Cette fonction récupère le mode d'exécution passé en ligne de commande
+# Cette fonction rï¿½cupï¿½re le mode d'exï¿½cution passï¿½ en ligne de commande
 # Retourne dans $v0 le mode
 choixMode2:
 	# Prologue
@@ -320,9 +320,9 @@ choixMode2:
 	sw $ra 0($sp)
 	
 	# Corps de la fonction
-	lw $a0 ($a1)			# Charge dans $a0 le premier argument entré en ligne de commande
-	jal CastStringInt			# Caste en entier la chaine de caractère
-	beq $v0 1 fin_choixMode2	# Vérifie si le mode est 1 ou 2
+	lw $a0 ($a1)			# Charge dans $a0 le premier argument entrï¿½ en ligne de commande
+	jal CastStringInt			# Caste en entier la chaine de caractï¿½re
+	beq $v0 1 fin_choixMode2	# Vï¿½rifie si le mode est 1 ou 2
 	beq $v0 2 fin_choixMode2
 	la $a0 texteModeError		# Cas d'une erreur
 	jal printfString			# Affichage du message d'erreur
@@ -341,7 +341,7 @@ choixMode2:
 # Cette fonction initialise un tableau d'entier NxN avec une valeur
 # $a0 : contient la taille du tableau
 # $a1 : contient l'adresse du premier element du tableau
-# $a2 : contient la valeur utilisée pour initialiser
+# $a2 : contient la valeur utilisï¿½e pour initialiser
 initialiseLabyrinthe:
 	# Prologue
 	addi $sp $sp -16
@@ -351,10 +351,10 @@ initialiseLabyrinthe:
 	sw $ra 0($sp)
 	
 	# Corps de la fonction
-	li $t0 0 					# itérateur de la ligne 
+	li $t0 0 					# itï¿½rateur de la ligne 
 	deb_parcoursLigneI:
 	beq $t0 $a0 fin_initialiseLabyrinthe # for (i = 0, i < $a0, i++)
-	li $t1 0 					# itérateur de la colonne 
+	li $t1 0 					# itï¿½rateur de la colonne 
 	deb_parcoursColonneI:
 	beq $t1 $a0 fin_parcoursColonneI 	# for (j = 0, j < $a0, j++)
 	mul $t3 $t0 $a0				# ((i*TailleColonne
@@ -362,11 +362,11 @@ initialiseLabyrinthe:
 	mul $t3 $t3 4				#			      *sizeOf(Int))
 	add $t3 $t3 $a1				#                                             + addrDebut == tab[i][j]
 	sw $a2 ($t3)				# tab[i][j] = $a2
-	addi $t1 $t1 1				# Incrémente j
-	j deb_parcoursColonneI			# Passe au début de la boucle j
+	addi $t1 $t1 1				# Incrï¿½mente j
+	j deb_parcoursColonneI			# Passe au dï¿½but de la boucle j
 	fin_parcoursColonneI:
-	addi $t0 $t0 1				# Incrément i
-	j deb_parcoursLigneI			# Passe au début de la boucle i
+	addi $t0 $t0 1				# Incrï¿½ment i
+	j deb_parcoursLigneI			# Passe au dï¿½but de la boucle i
 	
 	# Epilogue
 	fin_initialiseLabyrinthe:
@@ -389,10 +389,10 @@ afficheLabyrinthe:
 	
 	# Corps de la fonction
 	la $t0 ($a0)
-	li $t1 0 					# itérateur de la ligne 
+	li $t1 0 					# itï¿½rateur de la ligne 
 	deb_parcoursLigneA:
 	beq $t1 $t0 fin_afficheLabyrinthe 	# for (i = 0, i < $a0, i++)
-	li $t2 0 					# itérateur de la colonne 
+	li $t2 0 					# itï¿½rateur de la colonne 
 	deb_parcoursColonneA:
 	beq $t2 $t0 fin_parcoursColonneA	# for (j = 0, j < $a0, j++)
 	mul $t4 $t1 $t0				# ((i*TailleColonne
@@ -405,14 +405,14 @@ afficheLabyrinthe:
 	la $a0 espace				# Charge un espace
 	li $v0 4
 	syscall					# Affiche un espace
-	addi $t2 $t2 1				# Incrémente j
-	j deb_parcoursColonneA		# Passe au début de la boucle j
+	addi $t2 $t2 1				# Incrï¿½mente j
+	j deb_parcoursColonneA		# Passe au dï¿½but de la boucle j
 	fin_parcoursColonneA:
 	la $a0 retourChariot			# Charge '\n'
 	li $v0 4
 	syscall					# Fait un retour chariot
 	addi $t1 $t1 1				# Incremente i
-	j deb_parcoursLigneA			# Passe au début de la boucle i
+	j deb_parcoursLigneA			# Passe au dï¿½but de la boucle i
 	
 	# Epilogue
 	fin_afficheLabyrinthe:
@@ -422,10 +422,11 @@ afficheLabyrinthe:
 	addi $sp $sp 12
 	jr $ra
 
+
 # Cette fonction change le Nieme bit de $a1
-# $a0 : position du bit à changer
-# $a1 : valeur à changer
-# Retourne dans $v0 la valeur modifiée
+# $a0 : position du bit ï¿½ changer
+# $a1 : valeur ï¿½ changer
+# Retourne dans $v0 la valeur modifiï¿½e
 changeBitN:
 	# Prologue 
 	addi $sp $sp -12
@@ -434,61 +435,399 @@ changeBitN:
 	sw $ra 0($sp)
 	
 	# Corps de la fonction
-	bge $a0 4 bitSup4			# Cas des bits de 0 à 3
-		beq $a0 3 bit3			# Recherche du bit à changer
-			beq $a0 2 bit2	
-				beq $a0 1 bit1
-					li $t0 254	# Masque pour le bit 0 : 254 = 11111110
-					j finCas1	# Aller à la fin du premier cas
-				bit1 : 
-				li $t0 253		# Masque pour le bit 1 : 253 = 11111101
-				j finCas1		# Aller à la fin du premier cas
-			bit2 :
-			li $t0 251			# Masque pour le bit 2 : 251 = 11111011
-			j finCas1			# Aller à la fin du premier cas
-		bit3:
-		li $t0 247				# Masque pour le bit 3 : 247 = 11110111
-		j finCas1				# Aller à la fin du premier cas
-	bitSup4:					# Cas des bits de 4 à 7
 	li $t1 1
-	beq $a0 4 bit4				# Recherche du bit à changer
-		beq $a0 5 bit5
-			beq $a0 6 bit6
-				sll $t0 $t1 7	# Masque pour le bit 7 : 1 << 7 : 10000000
-				j finCas2		# Aller à la fin du second cas
-			bit6:
-			sll $t0 $t1 6		# Masque pour le bit 7 : 1 << 6 : 01000000
-			j finCas2			# Aller à la fin du second cas
-		bit5:
-		sll $t0 $t1 5			# Masque pour le bit 7 : 1 << 5 : 00100000
-		j finCas2				# Aller à la fin du second cas
-	bit4:
-	sll $t0 $t1 4				# Masque pour le bit 7 : 1 << 4 : 00010000
-	j finCas2					# Aller à la fin du second cas
-	
-	finCas1: 					# Fin du premier cas 
-		and $v0 $t0 $a1			# AND bit à bit à $a1
-		j fin_changeBitN			# Aller à la fin de la fonction
-	finCas2:					# Fin du second cas
-		addu $v0 $t0 $a1			# Mettre 1 au Nieme bit
-		j fin_changeBitN			# Aller à la fin de la fonction
+	sllv $t0 $t1 $a0 		# Masque pour le nombre 1 << N
+	xor $v0 $t0 $a1			# Place dans $v0 la nouvelle valeur
 	
 	# Epilogue
-	fin_changeBitN:
 	lw $a0 8($sp)
 	lw $a1 4($sp)
 	lw $ra 0($sp)
 	addi $sp $sp 12
 	jr $ra
+
+# Cette fonction retourne la valeur du bit Ã  la position N
+# $a0 contient la position du bit
+# $a1 contient la valeur Ã  checker
+# La fonction retourne dans $v0 la valeur du bit N
+checkValeurBitN:
+	#Prologue
+	addi $sp $sp -12
+	sw $a0 8($sp)
+	sw $a1 4($sp)
+	sw $ra 0($sp)
+
+	#Corps de la fonction
+	li $t0 1
+	sllv $t1 $t0 $a0		# Masque pour le nombre 1 << N
+	and $t2 $t1 $a1			# $a0 & (1 << N)
+	seq $v0 $t2 $t1			# Place dans $v0 le bit Ã  la position N
+
+	#Epilogue
+	lw $a0 8($sp)
+	lw $a1 4($sp)
+	lw $ra 0($sp)
+	addi $sp $sp 12
+	jr $ra
+
 	
+# Cette fonction transforme les coordonnï¿½es i,j en position dans le tableau
+# $a0 contient la coordonnï¿½e en i de la case
+# $a1 contient la coordonnï¿½e en j de la case
+# $a2 contient la taille du tableau
+# Retourne dans $v0 la position
+coordToPos:
+	# Prologue
+	addi $sp $sp -16
+	sw $a0 12($sp)
+	sw $a1 8($sp)
+	sw $a2 4($sp)
+	sw $ra 0($sp)
+	
+	# Corps de la fonction
+	la $t1 laby
+	mul $t0 $a0 $a2 	# ((i*TailleColonne
+	add $t0 $t0 $a1	#			  + j)
+	mul $t0 $t0 4	#			      *sizeOf(Int))
+	add $t0 $t0 $t1	#                                             + addrDebut == tab[i][j]
+
+	# Epilogue
+	la $v0 ($t0)
+	lw $a0 12($sp)
+	lw $a1 8($sp)
+	lw $a2 4($sp)
+	lw $ra 0($sp)
+	addi $sp $sp 16
+	jr $ra
+	
+# Cette fonction transforme la position dans le tableau en coordonnÃ©es i,j
+# $a0 contient la position de la case
+# $a1 contient la taille du tableau
+# Retourne dans $v0 la coordonnÃ©e en i et $v1 la coordonnÃ©e en j
+posToCoord:
+	# Prologue
+	addi $sp $sp -12
+	sw $a0 8($sp)
+	sw $a1 4($sp)
+	sw $ra 0($sp)
+
+	# Corps de la fonction
+	la $t0 laby 		# adresse du dÃ©but du laby
+	sub $t1 $a0 $t0  	# ((pos - adrDebut)
+	div $t1 $t1 4		#                 // sizeof(Int))
+	div $v0 $t1 $a1 	# i = res//tailleColonne
+	mfhi $v1			# j = res%tailleColonne
+
+	# Epilogue
+	lw $a0 8($sp)
+	lw $a1 4($sp)
+	lw $ra 0($sp)
+	addi $sp $sp -12
+	jr $ra
+
+
+# Cette fonction modifie le labyrinthe
+# $a0 contient la position de la case
+# $a1 contient le bit qui se modifier pour le nombre en i,j
+# effet de bord sur laby 
+updateLabyrinthe:
+	# Prologue
+	addi $sp $sp -12
+	sw $a0 8($sp)
+	sw $a1 4($sp)
+	sw $ra 0($sp)
+	
+	# Corps de la fonction
+	lw $t0 ($a0)
+	la $s0 ($a0)
+	la $t1 ($a1)
+	la $a0 ($t1)
+	la $a1 ($t0)
+	jal changeBitN
+	sw $v0 ($s0)
+
+	# Epilogue
+	lw $a0 8($sp)
+	lw $a1 4($sp)
+	lw $ra 0($sp)
+	addi $sp $sp 12
+	jr $ra
+
+# Cette fonction permet de placer le depart et l'arrivï¿½e
+# $a0 contient la taille du labyrinthe
+# Retourne dans $v0 la position de la case de dï¿½part
+choixDepartArrivee:
+	# Prologue
+	addi $sp $sp -24
+	sw $a0 20($sp)
+	sw $a1 16($sp)
+	sw $a2 12($sp)
+	sw $s0 8($sp)
+	sw $s1 4($sp)
+	sw $ra 0($sp)
+	
+	# Corps de la fonction
+	
+	# Travaille sur la position de la case de dï¿½part. La case d'arrivï¿½e est placï¿½e en fonction de celle de dï¿½part
+	# Choix de horizontal / Vertical
+	# Choisit  alï¿½atoirement un entier entre 0 et 1. 
+	# 0 : la case sera ï¿½ la verticale
+	# 1 : la case sera ï¿½ l'horizontale
+	la $s1 ($a0)
+	li $a0 0
+	li $a1 2 
+	li $v0 42
+	syscall 
+	move $t0 $a0
+	
+	# Choix du cï¿½tï¿½
+	# Choisit  alï¿½atoirement un entier entre 0 et 1. 
+	# Si c'est l'orientation verticale : 
+	## 0 : la case sera en haut
+	## 1 : la case sera en bas
+	# Si c'est l'orientation horizontale :
+	## 0 : la case sera ï¿½ gauche
+	## 1 : la case sera ï¿½ droite
+	li $a0 0
+	li $a1 2
+	li $v0 42
+	syscall 
+	move $t1 $a0
+	
+	# Choix position de dï¿½part
+	# Choisit  alï¿½atoirement un entier entre 0 et taille - 1 
+	li $a0 0
+	la $a1 ($s1)
+	li $v0 42
+	syscall 
+	move $t3 $a0
+	
+	# Choix position d'arrivï¿½e
+	# Choisit  alï¿½atoirement un entier entre 0 et taille - 1 
+	li $a0 0
+	la $a1 ($s1)
+	li $v0 42
+	syscall 
+	move $t4 $a0
+	
+	bnez $t1 secondCote	# Test du choix du cotï¿½ : haut/bas - gauche/droite
+	premierCote:		# Cas du premier cï¿½tï¿½ : haut ou gauche
+	li $t5 0			# $t5 coordonnï¿½e de la case de dï¿½part
+	la $t6 ($s1)			# $t6 coordonnï¿½e de la case de d'arrivï¿½e
+	addi $t6 $t6 -1
+	bnez $t0 suite_choixH	# Test de l'orientation : horizontale/verticale
+	j suite_choixV
+	secondCote:		# Cas du second cï¿½tï¿½ : bas ou droite
+	li $t6 	0			# $t6 coordonnï¿½e de la case de d'arrivï¿½e
+	la $t5 ($s1)			# $t5 coordonnï¿½e de la case de dï¿½part
+	addi $t5 $t5 -1
+	bnez $t0 suite_choixH	# Test de l'orientation : horizontale/verticale
+	j suite_choixV
+	
+	suite_choixV:		# Cas de l'orientation verticale
+	la $a0 ($t5)			# $a0 contient la coordonnï¿½e en i de la case de dï¿½part
+	la $a1 ($t3)			# $a1 contient la coordonnï¿½e en j de la case de dï¿½part
+	la $a2 ($s1)		# $a2 contient la taille du labyrinthe
+	jal coordToPos
+	la $a0 ($v0)		# $a0 contient la position de la case
+	li $a1 4			# $a3 contient le bit ï¿½ modifier pour marquer comme case de dï¿½part
+	jal updateLabyrinthe	# Appel de la fonction pour placer la case de dï¿½part
+	la $s0 ($a0)		# $s0 contient la postion de la case de dï¿½part
+	la $a0 ($t6)			# $a0 contient la coordonnï¿½e en i de la case d'arrivï¿½e
+	la $a1 ($t4)			# $a1 contient la coordonnï¿½e en j de la case d'arrivï¿½e
+	la $a2 ($s1)		# $a2 contient la taille du labyrinthe
+	jal coordToPos
+	la $a0 ($v0)		# $a0 contient la position de la case
+	li $a1 5			# $a3 contient le bit ï¿½ modifier pour marquer comme case d'arrivï¿½e
+	jal updateLabyrinthe	# Appel de la fonction pour placer la case d'arrivï¿½e
+	j fin_choixDepartArrivee
+	
+	suite_choixH:		# Cas de l'orientation horizontale
+	la $a0 ($t3)			# $a0 contient la coordonnï¿½e en i de la case de dï¿½part
+	la $a1 ($t5)			# $a1 contient la coordonnï¿½e en j de la case de dï¿½part
+	la $a2 ($s1)		# $a2 contient la taille du labyrinthe
+	jal coordToPos
+	la $a0 ($v0)		# $a0 contient la position de la case
+	li $a1 4			# $a3 contient le bit ï¿½ modifier pour marquer comme case de dï¿½part
+	jal updateLabyrinthe	# Appel de la fonction pour placer la case de dï¿½part
+	la $s0 ($v0)		# $s0 contient la postion de la case de dï¿½part
+	la $a0 ($t4)			# $a0 contient la coordonnï¿½e en i de la case d'arrivï¿½e
+	la $a1 ($t6)			# $a1 contient la coordonnï¿½e en j de la case d'arrivï¿½e
+	la $a2 ($s1)		# $a2 contient la taille du labyrinthe
+	jal coordToPos
+	la $a0 ($v0)		# $a0 contient la position de la case
+	li $a1 5			# $a3 contient le bit ï¿½ modifier pour marquer comme case d'arrivï¿½e
+	jal updateLabyrinthe	# Appel de la fonction pour placer la case d'arrivï¿½e
+	j fin_choixDepartArrivee	
+	
+	# Epilogue
+	fin_choixDepartArrivee:
+	la $v0 ($s0)		# Place dans $v0 la position de la case dï¿½part.
+	lw $a0 20($sp)
+	lw $a1 16($sp)
+	lw $a2 12($sp)
+	lw $s0 8($sp)
+	lw $s1 4($sp)
+	lw $ra 0($sp)
+	addi $sp $sp 24
+	jr $ra
+
+# Cette fonction vï¿½rifie si une case a des voisins non visitï¿½s
+# $a0 position de la case
+# $a1 taille du labyrinthe
+# la fonction retourne dans $v0 -1 si la case n'a pas de voisins non visitï¿½s sinon la position d'un des voisins
+voisinNonVisite:
+	# Prologue
+	addi $sp $sp -32
+	sw $a0 28($sp)
+	sw $a1 24($sp)
+	sw $s0 20($sp)
+	sw $s1 16($sp)
+	sw $s2 12($sp)
+	sw $s3 8($sp)
+	sw $s4 4($sp)
+	sw $ra 0($sp)
+	
+	# Corps de la fonction
+	addi $s0 $a0 4			# $s0 : voisin de droite
+	addi $s1 $a0 -4			# $s1 : voisin de gauche
+	mul $t0 $a1 4
+	add $s2 $a0 $t0			# $s2 : voisin du haut
+	mul $t0 $a1 -4
+	add $s3 $a0 $t0			# $s3 : voisin du bas
+
+	la $t0 laby				# position minimale
+	mul $t1 $a1 $a1			# (NÂ²
+	sub $t1 $t1 $a1         #    - N)
+	mul $t1 $t1 4 			#        *sizeof(Int)
+	add $t1 $t1 $t0			#                     + adrDebut = position maximale
+
+	## Le voisin est bien dans le laby ?
+	blt $s0 $t0 noDroite	# VÃ©rifie si le voisin de droite est dans le labyrinthe
+	bgt $s0 $t1 noDroite
+	j forGauche				# Passe au voisin de gauche
+	noDroite:
+		li $s0 -1			# Met -1 si le voisin n'est pas dans le labyrinthe
+	forGauche:
+	blt $s1 $t0 noGauche	# VÃ©rifie si le voisin de gauche est dans le labyrinthe
+	bgt $s1 $t1 noGauche
+	j forHaut				# Passe au voisin du haut
+	noGauche:
+		li $s1 -1			# Met -1 si le voisin n'est pas dans le labyrinthe
+	forHaut:
+	blt $s2 $t0 noHaut		# VÃ©rifie si le voisin du haut est dans le labyrinthe
+	bgt $s2 $t1 noHaut
+	j forBas				# Passe au voisin du bas
+	noHaut:
+		li $s2 -1			# Met -1 si le voisin n'est pas dans le labyrinthe
+	forBas:
+	blt $s3 $t0 noBas		# VÃ©rifie si le voisin du bas est dans le labyrinthe
+	bgt $s3 $t1 noBas
+	j forSuite				# Continue la suite de l'algo
+	noBas:
+		li $s3 -1			# Met -1 si le voisin n'est pas dans le labyrinthe
+	
+	forSuite:
+	li $s4 0 				# Compteur de voisins non visitÃ©s
+	## Check s'il est dÃ©ja visitÃ©
+	beq $s0 -1 apresVD		# Si le voisin est dans le labyrinthe, le mettre dans le stack, sinon passer au suivant
+	li $a0 7				# Charge dans $a0 la valeur indiquant le bit 7
+	lw $a1 ($s0)			# Charge dans $a1 la valeur du voisin 
+	jal checkValeurBitN		# VÃ©rifie s'il est dÃ©jÃ  visitÃ©
+	beq $v0 1 apresVD		# S'il est dÃ©ja visitÃ©, passer au prochain voisin
+	addi $s4 $s4 1			# Sinon, incrÃ©mentÃ© le nombre de voisins non visitÃ©s
+	addi $sp $sp -4			# Allouer de l'espace dans la pile
+	sw $s0 ($sp)			# Placer la case en haut de pile
+
+	apresVD:
+	beq $s1 -1 apresVG
+	lw $a1 ($s1)
+	jal checkValeurBitN
+	beq $v0 1 apresVG
+	addi $s4 $s4 1
+	addi $sp $sp -4
+	sw $s1 ($sp)
+
+	apresVG:
+	beq $s2 -1 apresVH
+	lw $a1 ($s2)
+	jal checkValeurBitN
+	beq $v0 1 apresVH
+	addi $s4 $s4 1
+	addi $sp $sp -4
+	sw $s2 ($sp)
+
+	apresVH:
+	beq $s3 -1 apresVB
+	lw $a1 ($s3)
+	jal checkValeurBitN
+	beq $v0 1 apresVB
+	addi $s4 $s4 1 
+	addi $sp $sp -4
+	sw $s3 ($sp)
+
+	apresVB: 
+## choix du voisin
+	beqz $s4 tousVisite		# VÃ©rifie s'il y'a des voisins non visitÃ©s
+	li $a0 0				# Choisir un nombre alÃ©atoire pour choisir le voisin
+	la $a1 ($s4)
+	li $v0 42
+	syscall 
+	move $t1 $a0			# Mettre dans $t1 le numero choisi
+	mul $t1 $t1 4			# Calculez l'adresse dans la pile d'un voisin en fonction du numÃ©ro choisi
+	la $t2 ($sp)
+	add $t2 $t2 $t1		
+	lw $v0 ($t2)			# Place dans $v0 le voisin non visitÃ© choisit alÃ©atoirement
+
+	deb_retourNormal:		# DÃ©pile les voisins mis dans la pile
+	beqz $s4 fin_voisinNonVisite
+	addi $sp $sp 4
+	addi $s4 $s4 -1	
+	j deb_retourNormal
+	
+	tousVisite:				# Cas oÃ¹ tous les voisins sont dÃ©jÃ  visitÃ©s
+	li $v0 -1				# Place dans $v0 -1
+	# Epilogue
+	fin_voisinNonVisite:
+	lw $a0 28($sp)
+	lw $a1 24($sp)
+	lw $s0 20($sp)
+	lw $s1 16($sp)
+	lw $s2 12($sp)
+	lw $s3 8($sp)
+	lw $s4 4($sp)
+	lw $ra 0($sp)
+	addi $sp $sp 32
+	jr $ra
+
 # BLOC GENERATION
 modeGeneration:
+	## DONNEES
 	la $a0 ($s1) 		# Place dans $a0 la taille du labyrinthe
- 	la $a1 laby			# Place dans $a1 l'adresse du début du labyrinthe
+ 	la $a1 laby			# Place dans $a1 l'adresse du dï¿½but du labyrinthe
  	li $a2 15			# initialise le labyrinthe avec la valeur 15  :  00001111
  	jal initialiseLabyrinthe   # initialisation du labyrinthe
+ 	#jal afficheLabyrinthe
+
+ 	## INITIALISATION
+ 	jal choixDepartArrivee
+ 	la $s3 ($v0)		# $s3 contient la case courante
+ 	
+ 	li $a0 7			# Bit ï¿½ marquer pour dï¿½finir comme visitï¿½
+ 	lw $a1 ($s3)		# Valeur ï¿½ changer
+ 	jal changeBitN		# Change le bit 
+ 	sw $v0 ($s3)		# Stocke la nouvelle valeur dans le tableau
+
+	la $a0 ($s3)
+	la $a1 ($s1)
+	jal voisinNonVisite
+	la $s3 ($v0)
+ 	 	
+ 	la $a0 ($s1) 		# Place dans $a0 la taille du labyrinthe
+ 	la $a1 laby			# Place dans $a1 l'adresse du dï¿½but du labyrinthe	
  	jal afficheLabyrinthe
 	j exit
+ 	
 	
 # BLOC RESOLUTION
 modeResolution:
