@@ -1,7 +1,7 @@
 ####################- INFOS GENERALES -##############
-# - On ne demande pas la taille en entrÈe si on est dans le mode de rÈsolution
+# - On ne demande pas la taille en entr√©e si on est dans le mode de r√©solution
 # - nomFichier == NOM DU FICHIER
-# - $s0 == MODE
+# - $s0 == MODE //1==cr√©ation laby ; 2==r√©solution
 # - $s1 == TAILLE DU FICHER
 #####################################################
 
@@ -10,11 +10,14 @@
 #####################################################
 
 .data
-	retourChariot : .asciiz "\n"  # chaine de caractËre pour le retour chariot
+	retourChariot : .asciiz "\n"  # chaine de caract√®re pour le retour chariot
 	chaineVide : .asciiz "" # juste une chaine vide
 	
 	texteErreurParam : .asciiz "Nombre d'arguments incorrect"
 	
+	.align 2 				  #Pour etre sur d'aligner les emplacement m√©moire
+	buffer: .space 1024       # Buffer qui sert lors de l'ouverture du fichier texte
+
 	nomFichier: .space 256
 	extension1 : .asciiz ".txt"
 	extension2 : .asciiz ".txt.resolu"
@@ -31,24 +34,24 @@
 .text
 .globl _main
 
-# Point d'entrÈe du programme
+# Point d'entr√©e du programme
 _main:         
-	beqz $a0 startSansParam # Cas o˘ des arguments ne sont pas rentrÈs en ligne de commande
-	bnez $a0 startAvecParam # Cas o˘ des arguments sont rentrÈs en ligne de commande
+	beqz $a0 startSansParam # Cas o√π des arguments ne sont pas rentr√©s en ligne de commande
+	bnez $a0 startAvecParam # Cas o√π des arguments sont rentr√©s en ligne de commande
 
 startSansParam:
 	jal choixFichier1	# Appel de la fonction choixFichier1
 
 	jal choixMode1	# Appel de la fonction choixMode1
-	la $s0 ($v0)	# Place dans $s0 le mode d'exÈcution
-	addi $s0 $s0 -1	# On addition -1 ‡ $s0 (comme Áa on peut beqz) (donc $s0==0 ou $s0==1)
+	la $s0 ($v0)	# Place dans $s0 le mode d'ex√©cution
+	addi $s0 $s0 -1	# On addition -1 √† $s0 (comme √ßa on peut beqz) (donc $s0==0 ou $s0==1)
 
-	bnez $s0 finParam     # On ne demande pas la taille si on est dans le mode rÈsolution
+	bnez $s0 finParam     # On ne demande pas la taille si on est dans le mode r√©solution
 		jal choixTaille1  # Appel de la fonction choixTaille1
 		la $s1 ($v0)	  # Place dans $s1 la taille du labyrinthe
 
 	finParam:
-		j suiteMain		# Continue l'exÈcution principale
+		j suiteMain		# Continue l'ex√©cution principale
 
 startAvecParam:
 	bne $a0 3  erreurParam	
@@ -56,10 +59,10 @@ startAvecParam:
 	jal choixTaille2	# Appel de la fonction choixTaille2
 	la $s1 ($v0)	# Place dans $s1 la taille du labyrinthe
 	jal choixMode2	# Appel de la fonction choixMode2
-	la $s0 ($v0) 	# Place dans $s0 le mode d'exÈcution
+	la $s0 ($v0) 	# Place dans $s0 le mode d'ex√©cution
 	la $a0 ($s0)
 	jal printfInt
-	j suiteMain		# Continue l'exÈcution principale
+	j suiteMain		# Continue l'ex√©cution principale
 	erreurParam:
 	la $a0 texteErreurParam
 	jal printfString
@@ -72,7 +75,7 @@ exit:
 	
 # BLOC DES FONCTIONS UTILITAIRES
 
-# Affiche la chaine de caractËres dans $a0 puis fait un retour chariot
+# Affiche la chaine de caract√®res dans $a0 puis fait un retour chariot
 printfString :
 	# Prologue
 	addi $sp $sp -8
@@ -112,7 +115,7 @@ printfInt :
 	addi $sp $sp 8
 	jr $ra
 
-# Cette fonction caste la chaine de caractËre contenu dans $a0 en entier
+# Cette fonction caste la chaine de caract√®re contenu dans $a0 en entier
 # Retourne dans $v0 l'entier
 CastStringInt:
 	# Prologue
@@ -121,14 +124,14 @@ CastStringInt:
 	sw $ra 0($sp)
 	
 	# Corps de la fonction
-	la $t0 ($a0) 			# La chaine de caractËres ‡ caster
-	li $t1 0				# ItÈrateur
+	la $t0 ($a0) 			# La chaine de caract√®res √† caster
+	li $t1 0				# It√©rateur
 	li $t7 0				# Valeur finale
 	deb_CastStringInt:
-	add $t2 $t0 $t1			# Place dans $t2 l'adresse du caractËre 
-	lbu $t3 ($t2)			# Charge dans $t3 le byte du caractËre
-	beq $t3 '\0' fin_CastStringInt # VÈrifie si ce n'est pas la sentinelle
-	addi $t4 $t3 -48			# Convertit le caractËre en Int
+	add $t2 $t0 $t1			# Place dans $t2 l'adresse du caract√®re 
+	lbu $t3 ($t2)			# Charge dans $t3 le byte du caract√®re
+	beq $t3 '\0' fin_CastStringInt # V√©rifie si ce n'est pas la sentinelle
+	addi $t4 $t3 -48			# Convertit le caract√®re en Int
 	mul $t7 $t7 10 
 	add $t7 $t7 $t4
 	addi $t1 $t1 1
@@ -142,8 +145,8 @@ CastStringInt:
 	la $v0 ($t7)
 	jr $ra
 
-# Cette fonction concatËne deux chaines de caractËres dans les adresses de debuts sont dans $a0 et $a1
-# Ajoute ‡ la fin la chaine pointÈe par $a0 la chaine pointÈe par $a1
+# Cette fonction concat√®ne deux chaines de caract√®res dans les adresses de debuts sont dans $a0 et $a1
+# Ajoute √† la fin la chaine point√©e par $a0 la chaine point√©e par $a1
 concat:
 	# Prologue
 	addi $sp $sp -12
@@ -153,18 +156,18 @@ concat:
 	
 	# Corps de la fonction
 	deb_premiereChaine:			# Parcours de la premiere chaine
-	lb $t0 ($a0)					# Prends le caractËre ‡ l'adresse $a0
-	beq $t0 '\n' deb_secondeChaine	# Si c'est le retourChariot alors aller ‡ la seconde chaine
-	addi $a0 $a0 1 				# Sinon prendre le caractËre suivant
-	j deb_premiereChaine			# RÈpÈter l'itÈration
+	lb $t0 ($a0)					# Prends le caract√®re √† l'adresse $a0
+	beq $t0 '\n' deb_secondeChaine	# Si c'est le retourChariot alors aller √† la seconde chaine
+	addi $a0 $a0 1 				# Sinon prendre le caract√®re suivant
+	j deb_premiereChaine			# R√©p√©ter l'it√©ration
 	
 	deb_secondeChaine:			#Parcours de la seconde chaine
-	lb $t1 ($a1)					# Prends le caractËre ‡ l'adresse $a1
+	lb $t1 ($a1)					# Prends le caract√®re √† l'adresse $a1
 	beq $t1 '\0' fin_concat			# Si c'est la sentinelle alors sortir de la fonction
-	sb $t1 ($a0)				# Sinon ajouter ‡ la fin de la premiere chaine
-	addi $a0 $a0 1				# Passer ‡ la prochaine adresse dans la premiere chaine
-	addi $a1 $a1 1				# Passer au caractËre suivant dans la seconde chaine
-	j deb_secondeChaine 			# RÈpÈter l'itÈration
+	sb $t1 ($a0)				# Sinon ajouter √† la fin de la premiere chaine
+	addi $a0 $a0 1				# Passer √† la prochaine adresse dans la premiere chaine
+	addi $a1 $a1 1				# Passer au caract√®re suivant dans la seconde chaine
+	j deb_secondeChaine 			# R√©p√©ter l'it√©ration
 	
 	# Epilogue
 	fin_concat:
@@ -191,7 +194,7 @@ choixFichier1:
 	la $a0 nomFichier				# Chargement de l'adresse de stockage
 	li $a1 256					# Chargement de la taille max
 	li $v0 8					
-	syscall					# Appel systeme pour demander ‡ l'utilsateur
+	syscall					# Appel systeme pour demander √† l'utilsateur
 	la $a0 nomFichier				# Chargement du premier argument de concat
 	la $a1 extension1				# Chargement du second argument de concat
 	jal concat					# Concatenation de $a0 et $a1
@@ -217,11 +220,11 @@ choixTaille1:
 	li $v0 4
 	syscall					# Affichage du message de la demande
 	li $v0 5					
-	syscall					# Lecture de l'entier reprÈsentant la taille
-	bgt $v0 1 fin_choixTaille1		# Teste si la taille est supÈrieure stricte ‡ 1
+	syscall					# Lecture de l'entier repr√©sentant la taille
+	bgt $v0 1 fin_choixTaille1		# Teste si la taille est sup√©rieure stricte √† 1
 	la $a0 texteDemandeTailleError	# Cas d'une erreur
 	jal printfString				# Affichage du message d'erreur
-	j deb_choixTaille1			# Redemande ‡ l'utilisateur d'entrer une valeur
+	j deb_choixTaille1			# Redemande √† l'utilisateur d'entrer une valeur
 	
 	# Epilogue
 	fin_choixTaille1:
@@ -231,7 +234,7 @@ choixTaille1:
 	jr $ra
 	
 
-# Cette fonction permet de choisir le mode d'exÈcution dans le cas du lancement du programme sans arguments
+# Cette fonction permet de choisir le mode d'ex√©cution dans le cas du lancement du programme sans arguments
 # Retourne dans $v0 le choix de l'utilisateur
 choixMode1:
 	# Prologue
@@ -249,14 +252,14 @@ choixMode1:
 	syscall				    # Affichage du message de choix
 	li $v0 5				# Lecture de l'entier representant le choix
 	syscall
-	beq $v0 1 fin_choixMode1	# VÈrifie si la valeur est Ègale ‡ 1 ou 2 
+	beq $v0 1 fin_choixMode1	# V√©rifie si la valeur est √©gale √† 1 ou 2 
 	beq $v0 2 fin_choixMode1
 	la $a0 texteModeError		# Cas d'une valeur invalide
 	li $a1 2				    # On met une boite de dialogue pour les erreurs ?
 	li $v0 55
 	syscall
 	jal printfString			# Affichage du message d'erreur
-	j deb_choixMode1			# Redemande ‡ l'utilisateur de faire un choix
+	j deb_choixMode1			# Redemande √† l'utilisateur de faire un choix
 	
 	# Epilogue
 	fin_choixMode1:
@@ -267,7 +270,7 @@ choixMode1:
 	jr $ra
 
 	
-# Cette fonction rÈcupËre le nom du fichier passÈe en ligne de commande
+# Cette fonction r√©cup√®re le nom du fichier pass√©e en ligne de commande
 # Place dans nomFichier le nom du fichier	
 choixFichier2:
 	# Prologue
@@ -278,14 +281,14 @@ choixFichier2:
 	
 	# Corps de la fonction
 	la $t0 nomFichier			# Charge dans $t0 l'adresse du nom du fichier
-	lw $t1 8($a1)			# Charge dans $t1 le troisieme argument entrÈ en ligne de commande
+	lw $t1 8($a1)			# Charge dans $t1 le troisieme argument entr√© en ligne de commande
 	deb_choixFichier2:
-	lb $t2 ($t1)				# Prend le premier caractËre ‡ l'adresse $t1
-	beq $t2 '\0' fin_choixFichier2	# Si c'est la sentinelle alors aller ‡ la fin de la fonction
-	sb $t2 ($t0)				# Sinon mettre dans ‡ la fin de NomFichier
-	addi $t0 $t0 1			# Passer ‡ l'adresse suivante pour nomFichier
-	addi $t1 $t1 1			# Prendre le caractËre suivant
-	j deb_choixFichier2		# RÈpÈter l'itÈration
+	lb $t2 ($t1)				# Prend le premier caract√®re √† l'adresse $t1
+	beq $t2 '\0' fin_choixFichier2	# Si c'est la sentinelle alors aller √† la fin de la fonction
+	sb $t2 ($t0)				# Sinon mettre dans √† la fin de NomFichier
+	addi $t0 $t0 1			# Passer √† l'adresse suivante pour nomFichier
+	addi $t1 $t1 1			# Prendre le caract√®re suivant
+	j deb_choixFichier2		# R√©p√©ter l'it√©ration
 												
 	# Epilogue
 	fin_choixFichier2:
@@ -295,7 +298,7 @@ choixFichier2:
 	addi $sp $sp 12
 	jr $ra
 
-# Cette fonction rÈcupËre la taille du labyrinthe passÈe en ligne de commande
+# Cette fonction r√©cup√®re la taille du labyrinthe pass√©e en ligne de commande
 # Retourne dans $v0 la taille 
 choixTaille2:
 	# Prologue
@@ -305,9 +308,9 @@ choixTaille2:
 	sw $ra 0($sp)
 	
 	# Corps de la fonction
-	lw $a0 4($a1)				# Charge dans $a0 le deuxieme argument entrÈ en ligne de commande
-	jal CastStringInt				# Caste en entier la chaine de caractËre
-	bgt $v0 1 fin_choixTaille1		# Teste si la taille est supÈrieure stricte ‡ 1
+	lw $a0 4($a1)				# Charge dans $a0 le deuxieme argument entr√© en ligne de commande
+	jal CastStringInt				# Caste en entier la chaine de caract√®re
+	bgt $v0 1 fin_choixTaille1		# Teste si la taille est sup√©rieure stricte √† 1
 	la $a0 texteDemandeTailleError	# Cas d'une erreur
 	jal printfString				# Affichage du message d'erreur
 	j exit						# Sortie du programme
@@ -319,7 +322,7 @@ choixTaille2:
 	addi $sp $sp 12
 	jr $ra
 	
-# Cette fonction rÈcupËre le mode d'exÈcution passÈ en ligne de commande
+# Cette fonction r√©cup√®re le mode d'ex√©cution pass√© en ligne de commande
 # Retourne dans $v0 le mode
 choixMode2:
 	# Prologue
@@ -329,9 +332,9 @@ choixMode2:
 	sw $ra 0($sp)
 	
 	# Corps de la fonction
-	lw $a0 ($a1)			# Charge dans $a0 le premier argument entrÈ en ligne de commande
-	jal CastStringInt			# Caste en entier la chaine de caractËre
-	beq $v0 1 fin_choixMode2	# VÈrifie si le mode est 1 ou 2
+	lw $a0 ($a1)			# Charge dans $a0 le premier argument entr√© en ligne de commande
+	jal CastStringInt			# Caste en entier la chaine de caract√®re
+	beq $v0 1 fin_choixMode2	# V√©rifie si le mode est 1 ou 2
 	beq $v0 2 fin_choixMode2
 	la $a0 texteModeError		# Cas d'une erreur
 	jal printfString			# Affichage du message d'erreur
@@ -364,26 +367,50 @@ modeResolution:
 	
 	# Ouvre le fichier pour lecture
 
-	li   $v0, 13       		  # system call for open file
-	la   $a0, NomFichier      # input file name
-	li   $a1, 0               # flag for reading
-	li   $a2, 0               # mode is ignored
-	syscall                   # open a file 
-	move $s0, $v0             # save the file descriptor 
+	li   $v0, 13       		  # syscall pour ouvrir un fichier
+	la   $a0, nomFichier      # nom du fichier
+	li   $a1, 0               # mode d'ouverture (lecture, ecriture etc..)
+	li   $a2, 0               # argument ignor√© par Mars il me semble
+	syscall                   
+	move $s0, $v0             # sauvegarde du "file descriptor" dans $s0 
 
-	# Lis le fichier qui vient d'Ítre ouvert
+	CreerTableau:
+		li   $v0, 14              # syscall pour lire un fichier
+		move $a0, $s0             # $a0 <-- file descirpor ($s0)
+		la   $a1, buffer          # adress du buffer duquel lire
+		li   $a2,  1              # taille du buffer (hardcoded)
+		syscall  
 
-	li   $v0, 14              # system call for reading from file
-	move $a0, $s0             # file descriptor 
-	la   $a1, buffer          # address of buffer from which to read
-	li   $a2,  11             # hardcoded buffer length
-	syscall                   # read from file
+		
+		lb $s1 0($a1)       # Premier digit
+    	subiu $s1 $s1 0x30  # On le convertit en entier
+    	mul $s1 $s1 10      # Multiplication par 10 car chiffre des dizaines
 
-	#li  $v0, 4         # 
-	la  $a0, buffer     # buffer contains the values
-	syscall             # print int
+    	
+    	li $v0, 1           #Affiche pour voir si √ßa marche
+    	move $a0, $s1
+    	syscall
 
-	lb $t1 , buffer
+    	
+    	li $v0 14           # Appel syst√®me pour lire un fichier
+	    move $a0, $s0       # $a0 <-- file descirpor ($s0)
+	    syscall
+
+	    lb $s2 0($a1)       # Deuxi√®me digit
+	    subiu $s2 $s2 0x30  # On le converti en entier
+
+	    li $v0, 1           #Affiche pour voir si √ßa marche
+    	move $a0, $s2
+    	syscall
+
+    	addu $t2, $s1, $s2  # $t2 contient la taille d'un cot√© du laby (N = $s1 + $s2)
+
+ 		
+    	mul $a0, $t2, $t2    # $a0 contient la taille du tableau pour l'allocation m√©moire
+    	li  $v0, 9           # syscall 9 pour allouer de la m√©moire
+
+    	move $v0, $s3        # $s3 contient l'addresse du premier √©l√©ment du tableau
+
 
 	j exit
 	

@@ -1,0 +1,8 @@
+# Specify filepatterns you want git to ignore.
+
+Rapport.*
+*.tex
+Mars4_5.jar
+
+
+commande_a_executer

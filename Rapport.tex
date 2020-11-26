@@ -29,8 +29,8 @@
 Pour commencer, moi et mon binôme Germain nous sommes mis d'accord sur le partage des tâches. Il s'occuperait de la génération du labyrinthe, quand à moi, je me chargerais de la résolution. 
 
 
-\chapter{Prendre en entrée la labyrithe}
-La première question à se poser est la suivante: \textbf{Comment charger le fichier texte du labyrinthe dans le programme ?}
+\chapter{Charger et lire le fichier texte}
+La première question à se poser est la suivante: \textbf{Comment lire le fichier texte du labyrinthe dans le programme ?}
 \newline
 \newline
 Ce processus ce passse en deux partie : 
@@ -44,10 +44,53 @@ Ce processus ce passse en deux partie :
 Ces deux partie feront intervenir des syscall.
 
 \paragraph{Chargement du fichier} 
-Premièrement, nous voulons charger le fichier, cela pourra se faire à l'aide du code suivant :
+Premièrement, nous voulons charger le fichier, cela pourra se faire à l'aide du syscall 13, selon le code suivant :
 \begin{lstlisting}[language={[mips]Assembler}]
-	syscall $v0 13
-	li $a1 3
+	li   $v0, 13       		  # syscall pour ouvrir un fichier
+	la   $a0, nomFichier      # nom du fichier
+	li   $a1, 0               # mode d'ouverture (lecture, ecriture etc..)
+	li   $a2, 0               # argument ignoré par Mars il semblerait
+	syscall                   
+	move $s0, $v0             # sauvegarde du "file descriptor" dans $s0 
 \end{lstlisting}
 
+Expliquons cette partie de code :
+\begin{itemize}
+	\item La première ligne place juste dans le register \textbf{\$v0} le nombre 13, qui nous servira donc à faire le syscall approprié.
+	\item Viennent ensuite les arguments : le premier, dans le registre \textbf{\$a0}, est le nom du ficher que nous souhaitons charger.
+	\item Le deuxième, dans le registre \textbf{\$a1}, est le \textit{flag}. Le \textit{flag} correspond au ``mode'' dans lequelle sera ouvert le fichier :
+		\begin{itemize}
+			\item 0 = lecture seule
+			\item 1 = écriture seule avec création
+			\item 9 = écriture seule avec création et ajout
+		\end{itemize}  
+	\item Enfin, le dernier argument, dans le registre \textbf{\$a0}, correspond au \textit{mode}. Cependant, il semble que cet argument ne soit pas pris en compte par le compilateur Mars.
+	\item Ensuite vient le syscall
+	\item Enfin, nous sauvegardons le resultats de ce syscall dans le registre \textbf{\$a0}. Ce resultat est un \textit{file desciptor} qui nous servira à lire le fichier. 
+\end{itemize}
+
+Une fois avoir charger le fichier, nous exécuterons le code suivant afin de pouvoir lire le fichier et utiliser son contenu :
+\begin{lstlisting}[language={[mips]Assembler}]
+	li   $v0, 14              # syscall pour lire un fichier
+	move $a0, $s0             # file descirpor
+	la   $a1, buffer          # adress du buffer duquel lire
+	li   $a2,  1000           # taille du buffer (hardcoded)
+	syscall 
+\end{lstlisting}
+Expliquons ce code :
+\begin{itemize}
+	\item Premierement, nous passons la valeur 14 dans le registre \textbf{\$v0} afin de faire le syscall approprié.
+	\item Ensuite, nous passons le \textit{file descriptor} reçu précedement un argument, dans \textbf{\$a0}
+	\item Nous passons ensuite dans le registre \textbf{\$a1} l'adresse du \textit{buffer}, la zone mémoire depuis laquelle nous pourrons lire le fichier
+	\item Enfin, nous passons le taille de ce \textit{buffer} en argument au registre \textbf{\$a2}. Celle-ci a été définie arbitrairement.
+\end{itemize}
+
+A présent, nous pouvons donc lire le fichier texte depuis la variable \textbf{buffer}. Cependant, afin de pouvoir parcourir et utiliser les valeurs données par le fichier texte, nous allons stocker ces valeurs dans un tableau
+
+\chapter{Stocker les valeurs dans un tableau et parcourir ce tableau}
+
+
 \end{document}
+
+
+
