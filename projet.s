@@ -376,15 +376,15 @@ modeResolution:
 
 	CreerTableau:
 		li   $v0, 14              # syscall pour lire un fichier
-		move $a0, $s0             # $a0 <-- file descirpor ($s0)
+		move $a0, $s0             # file descriptor dans $a0
 		la   $a1, buffer          # adress du buffer duquel lire
 		li   $a2,  1              # taille du buffer (hardcoded)
 		syscall  
 
 		
-		lb $s1 0($a1)       # Premier digit
-    	subiu $s1 $s1 0x30  # On le convertit en entier
-    	mul $s1 $s1 10      # Multiplication par 10 car chiffre des dizaines
+		lb $s1, 0($a1)       # Premier chiffre
+    	subiu $s1, $s1, 0x30  # Conversion en entier
+    	mul $s1, $s1, 10      # Multiplication par 10 car chiffre des dizaines
 
     	
     	li $v0, 1           #Affiche pour voir si ça marche
@@ -393,11 +393,11 @@ modeResolution:
 
     	
     	li $v0 14           # Appel système pour lire un fichier
-	    move $a0, $s0       # $a0 <-- file descirpor ($s0)
+	    move $a0, $s0       # file descirpor dans $a0
 	    syscall
 
-	    lb $s2 0($a1)       # Deuxième digit
-	    subiu $s2 $s2 0x30  # On le converti en entier
+	    lb $s2, 0($a1)       # Deuxième chiffre
+	    subiu $s2, $s2, 0x30  # On le converti en entier
 
 	    li $v0, 1           #Affiche pour voir si ça marche
     	move $a0, $s2
@@ -408,9 +408,57 @@ modeResolution:
  		
     	mul $a0, $t2, $t2    # $a0 contient la taille du tableau pour l'allocation mémoire
     	li  $v0, 9           # syscall 9 pour allouer de la mémoire
+    	syscall
 
-    	move $v0, $s3        # $s3 contient l'addresse du premier élément du tableau
 
+    	move $t0, $v0        # $t0 contient l'addresse du premier élément du tableau
+    	addu $t1, $t0, $a0   # adresse de fin de tableau dans $t1 (cela nous servira à parcourir le tableau)
+
+
+    RemplirTableau: 
+	    beq $t0 $t1 FinRemplissage
+
+	    li   $v0, 14              # syscall pour lire un fichier
+		move $a0, $s0             # file descriptor dans $a0
+		la   $a1, buffer          # adress du buffer duquel lire
+		li   $a2,  1              # taille du buffer (hardcoded)
+		syscall  
+
+
+	    lb $s1 0($a1)       # Caractère courant
+
+
+	    blt $s1, 48, RemplirTableau # Le caractère doit être un chiffre pour pouvoir être converti
+	    bgt $s1, 57, RemplirTableau # 48 <= chiffres <= 57
+
+	    subiu $s1, $s1, 0x30  # On converti le premier digit en entier
+	    mul $s1, $s1, 10      # On le multiplie par 10, car c'est le chiffre des dizaine
+
+
+	    li   $v0, 14         # syscall pour lire un fichier
+		move $a0, $s0        # file descriptor dans $a0
+		la   $a1, buffer     # adresse du buffer duquel lire
+		li   $a2,  1         # taille du buffer (hardcoded)
+		syscall  
+
+
+	    lb $s2, 0($a1)        # Second chiffre
+	    subiu $s1, $s1, 0x30  # Conversion en entier
+
+	    addu $s3, $s1, $s2    # $s3 = entier correspondant à la case
+
+	    sb $s3, 0($t0)       # On sauvegarde la valeur dans la bonne case du tableau
+
+
+    	addiu $t0, $t0, 1     # On incrémente $t0
+
+	    j RemplirTableau
+
+
+	FinRemplissage:
+    	move $a0 $s0        # On ferme le file descriptor
+    	li $v0 16           # syscall pour ferme le fichier
+    	syscall
 
 	j exit
 	
